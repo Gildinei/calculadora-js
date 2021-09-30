@@ -16,6 +16,8 @@ class CalcController {
         setInterval(() => {
             this.setDisplayDateTime();
         }, 1000);
+
+        this.setLastNumberToDisplay();
     };
 
     addEventListenerAll(element, events, fn) {
@@ -26,10 +28,14 @@ class CalcController {
 
     clearAll() {
         this._operation = [];
+
+        this.setLastNumberToDisplay();
     };
 
     clearEntry() {
         this._operation.pop();
+
+        this.setLastNumberToDisplay();
     };
 
     getLastOperation() {
@@ -55,11 +61,26 @@ class CalcController {
     };
 
     calc() {
-        let lastOperation = this._operation.pop();
+        let lastOperation = '';
+
+        if (this._operation.length > 3) {
+            lastOperation = this._operation.pop();
+        };
 
         let resultOperation = eval(this._operation.join(""));
 
-        this._operation = [resultOperation, lastOperation];
+        if (lastOperation == '%') {
+            resultOperation /= 100;
+
+            this._operation = [resultOperation];
+        } else {
+            this._operation = [resultOperation];
+
+            if (lastOperation) {
+                this._operation.push(lastOperation);
+            };
+        };
+
         this.setLastNumberToDisplay();
     };
 
@@ -71,6 +92,10 @@ class CalcController {
                 lastNumber = this._operation[i];
                 break;
             };
+        };
+
+        if (!lastNumber) {
+            lastNumber = 0;
         };
 
         this.displayCalc = lastNumber;
@@ -110,7 +135,7 @@ class CalcController {
                 this.clearAll();
                 break;
 
-            case 'ac':
+            case 'ce':
                 this.clearEntry();
                 break;
 
@@ -135,7 +160,7 @@ class CalcController {
                 break;
 
             case 'igual':
-
+                this.calc();
                 break;
 
             case 'ponto':
